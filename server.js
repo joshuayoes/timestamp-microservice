@@ -19,11 +19,18 @@ app.get("/", (req, res) => {
 
 // your first API endpoint... 
 app.get("/api/timestamp/:date_string?", (req, res) => {
-  const { date_string } = req.params;
+  let { date_string } = req.params;
 
-  const userDate = moment(date_string);
+  const containsNonInts = /[^\d]/g.test(date_string)
 
-  if (!userDate.isValid()) {
+  if (!containsNonInts) {
+    // Passed unix in seconds
+    date_string = parseInt(date_string * 1000);
+  }
+
+  const validDateInput = moment(date_string).isValid();
+
+  if (!validDateInput) {
     return res.status(400).json({
       "error": "Invalid Date" 
     })
