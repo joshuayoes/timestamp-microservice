@@ -21,13 +21,17 @@ app.get("/", (req, res) => {
 app.get("/api/timestamp/:date_string?", (req, res) => {
   let { date_string } = req.params;
 
+  //tests to see if input is unix timestamp (seconds)
   const containsNonInts = /[^\d]/g.test(date_string)
 
   if (!containsNonInts) {
-    // Passed unix in seconds
+    // Passed unix in seconds, converted to milliseconds
     date_string = parseInt(date_string * 1000);
   }
 
+  // Uses moment.js library
+  // https://momentjs.com/docs/#/parsing/is-valid/
+  // TODO: find way to avoid deprecation warning in log
   const validDateInput = moment(date_string).isValid();
 
   if (!validDateInput) {
@@ -36,6 +40,8 @@ app.get("/api/timestamp/:date_string?", (req, res) => {
     })
   }
 
+  // GET: /api/timestamp
+  // returns current time if not date_string passed in params
   if (!date_string) {
     const utcDate = new Date(Date.now()).toUTCString();
 
@@ -54,7 +60,7 @@ app.get("/api/timestamp/:date_string?", (req, res) => {
   });
 });
 
-// listen for requests :)
-var listener = app.listen(process.env.PORT || 3000, function () {
+// listen for requests 
+var listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Listening on port ' + listener.address().port + '...');
 });
